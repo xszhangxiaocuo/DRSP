@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-/*登陆路由注册*/
+//用户路由处理函数
 
 type HandlerUser struct {
 }
