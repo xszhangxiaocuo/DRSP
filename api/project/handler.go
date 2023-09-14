@@ -31,8 +31,7 @@ func (hp *HandlerProject) upload(ctx *gin.Context) {
 	for filePath, files := range form.File {
 		for _, file := range files {
 			filename := filepath.Base(file.Filename)
-			absPath := fmt.Sprintf("pkg/upload/%s%s", filePath, filename)
-			log.Println("保存路径：", absPath)
+			absPath := fmt.Sprintf("./pkg/upload/%s%s", filePath, filename)
 			if err := ctx.SaveUploadedFile(file, absPath); err != nil {
 				log.Println("保存失败！")
 				continue
