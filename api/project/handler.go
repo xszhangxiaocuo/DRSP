@@ -1,6 +1,7 @@
 package project
 
 import (
+	"DRSP/common"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -27,7 +28,7 @@ func (hp *HandlerProject) upload(ctx *gin.Context) {
 		log.Println("文件为空！")
 		return
 	}
-
+	text := make(map[string]string)
 	for filePath, files := range form.File {
 		for _, file := range files {
 			filename := filepath.Base(file.Filename)
@@ -36,7 +37,10 @@ func (hp *HandlerProject) upload(ctx *gin.Context) {
 				log.Println("保存失败！")
 				continue
 			}
+			text[filename] = common.Ocr(absPath)
+			fmt.Println(text[filename])
+			ctx.JSON(http.StatusOK, text[filename])
 		}
 	}
-	ctx.JSON(http.StatusOK, "ok")
+
 }
