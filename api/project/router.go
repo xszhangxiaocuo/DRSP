@@ -19,4 +19,5 @@ func (rp *RouterProject) Route(r *gin.Engine) {
 	h := NewHandlerProject()
 
 	r.POST("/project/upload", h.upload)
+	r.POST("/project/chat", h.chat)
 }
