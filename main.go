@@ -1,8 +1,9 @@
 package main
 
 import (
-	"DRSP/api"
+	router "DRSP/api"
 	_ "DRSP/api/api"
+	_ "DRSP/internal/database/gorms"
 	"github.com/gin-gonic/gin"
 )
 

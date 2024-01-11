@@ -14,11 +14,20 @@ import (
 type HandlerProject struct {
 }
 
+type RequestData struct {
+	Question string `json:"question"`
+}
+
+type ResponseData struct {
+	Reply string `json:"reply"`
+}
+
 func NewHandlerProject() *HandlerProject {
 	return &HandlerProject{}
 }
 
 func (hp *HandlerProject) upload(ctx *gin.Context) {
+	reply := ""
 	form, err := ctx.MultipartForm()
 	if err != nil {
 		log.Println(err.Error())
@@ -38,9 +47,28 @@ func (hp *HandlerProject) upload(ctx *gin.Context) {
 				continue
 			}
 			text[filename] = common.Ocr(absPath)
-			fmt.Println(text[filename])
-			ctx.JSON(http.StatusOK, text[filename])
+			reply = fmt.Sprintf("%s%s:%s\n", reply, filename, text[filename])
 		}
 	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"reply": reply,
+	})
+}
 
+func (hp *HandlerProject) chat(ctx *gin.Context) {
+	var requestData RequestData
+	//var responseData ResponseData
+
+	// 解析请求体中的JSON数据到requestData结构体中
+	if err := ctx.ShouldBindJSON(&requestData); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	fmt.Println(requestData.Question)
+	//responseData.Reply = openai.GetGpt().Chat(requestData.Question)
+	//fmt.Println(responseData.Reply)
+	//ctx.JSON(http.StatusOK, responseData)
+	ctx.JSON(http.StatusOK, gin.H{
+		"reply": "返回响应",
+	})
 }
