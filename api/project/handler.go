@@ -2,6 +2,7 @@ package project
 
 import (
 	"DRSP/common"
+	"DRSP/internal/openai"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -46,8 +47,12 @@ func (hp *HandlerProject) upload(ctx *gin.Context) {
 				log.Println("保存失败！")
 				continue
 			}
-			text[filename] = common.Ocr(absPath)
+			text[filename], err = common.Ocr(absPath)
+			if err != nil {
+				log.Println(err.Error())
+			}
 			reply = fmt.Sprintf("%s%s:%s\n", reply, filename, text[filename])
+			fmt.Println("reply:", reply)
 		}
 	}
 	ctx.JSON(http.StatusOK, gin.H{
@@ -57,7 +62,7 @@ func (hp *HandlerProject) upload(ctx *gin.Context) {
 
 func (hp *HandlerProject) chat(ctx *gin.Context) {
 	var requestData RequestData
-	//var responseData ResponseData
+	var responseData ResponseData
 
 	// 解析请求体中的JSON数据到requestData结构体中
 	if err := ctx.ShouldBindJSON(&requestData); err != nil {
@@ -65,10 +70,7 @@ func (hp *HandlerProject) chat(ctx *gin.Context) {
 		return
 	}
 	fmt.Println(requestData.Question)
-	//responseData.Reply = openai.GetGpt().Chat(requestData.Question)
-	//fmt.Println(responseData.Reply)
-	//ctx.JSON(http.StatusOK, responseData)
-	ctx.JSON(http.StatusOK, gin.H{
-		"reply": "返回响应",
-	})
+	responseData.Reply = openai.GetGpt().Chat(requestData.Question)
+	fmt.Println(responseData.Reply)
+	ctx.JSON(http.StatusOK, responseData)
 }
