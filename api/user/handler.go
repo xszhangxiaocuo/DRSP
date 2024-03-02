@@ -1,6 +1,7 @@
 package user
 
 import (
+	"DRSP/common"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -15,5 +16,6 @@ func NewHandlerUser() *HandlerUser {
 }
 
 func (hu *HandlerUser) login(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, "ok")
+	resp := &common.Result{}
+	ctx.JSON(http.StatusOK, resp.Success(nil))
 }
