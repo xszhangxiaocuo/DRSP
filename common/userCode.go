@@ -3,8 +3,8 @@ package common
 /*用户模块错误代码*/
 
 var (
-	CacheError             = NewError(500001, "Cache错误")
-	DBError                = NewError(500002, "DB错误")
+	CacheError             = NewError(200001, "Cache错误")
+	DBError                = NewError(200002, "DB错误")
 	NoLegalMobile          = NewError(100001, "手机号不合法")
 	CaptchaError           = NewError(100002, "验证码不合法")
 	CaptchaNotExist        = NewError(100003, "验证码不存在")

@@ -2,6 +2,7 @@ package project
 
 import (
 	"DRSP/common"
+	"DRSP/internal/openai"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -27,6 +28,7 @@ func NewHandlerProject() *HandlerProject {
 }
 
 func (hp *HandlerProject) upload(ctx *gin.Context) {
+	resp := &common.Result{}
 	reply := ""
 	form, err := ctx.MultipartForm()
 	if err != nil {
@@ -35,6 +37,7 @@ func (hp *HandlerProject) upload(ctx *gin.Context) {
 	}
 	if len(form.File) <= 0 {
 		log.Println("文件为空！")
+		ctx.JSON(http.StatusOK, resp.Fail(common.FileIsNull.Code, common.FileIsNull.Msg))
 		return
 	}
 	text := make(map[string]string)
@@ -46,29 +49,28 @@ func (hp *HandlerProject) upload(ctx *gin.Context) {
 				log.Println("保存失败！")
 				continue
 			}
-			text[filename] = common.Ocr(absPath)
+			text[filename], err = common.Ocr(absPath)
+			if err != nil {
+				log.Println(err.Error())
+			}
 			reply = fmt.Sprintf("%s%s:%s\n", reply, filename, text[filename])
+			fmt.Println("reply:", reply)
 		}
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"reply": reply,
-	})
+	ctx.JSON(http.StatusOK, resp.Success(reply))
 }
 
 func (hp *HandlerProject) chat(ctx *gin.Context) {
 	var requestData RequestData
-	//var responseData ResponseData
+	resp := &common.Result{}
 
 	// 解析请求体中的JSON数据到requestData结构体中
 	if err := ctx.ShouldBindJSON(&requestData); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, resp.Fail(common.DataParseFail.Code, common.DataParseFail.Msg))
 		return
 	}
 	fmt.Println(requestData.Question)
-	//responseData.Reply = openai.GetGpt().Chat(requestData.Question)
-	//fmt.Println(responseData.Reply)
-	//ctx.JSON(http.StatusOK, responseData)
-	ctx.JSON(http.StatusOK, gin.H{
-		"reply": "返回响应",
-	})
+	reply := openai.GetGpt().Chat(requestData.Question)
+	fmt.Println(reply)
+	ctx.JSON(http.StatusOK, resp.Success(reply))
 }
