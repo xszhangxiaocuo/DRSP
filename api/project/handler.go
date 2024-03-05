@@ -20,7 +20,7 @@ type RequestData struct {
 }
 
 type ResponseData struct {
-	Reply string `json:"reply"`
+	Result string `json:"result"`
 }
 
 func NewHandlerProject() *HandlerProject {
@@ -29,6 +29,7 @@ func NewHandlerProject() *HandlerProject {
 
 func (hp *HandlerProject) upload(ctx *gin.Context) {
 	resp := &common.Result{}
+	respData := &ResponseData{}
 	reply := ""
 	form, err := ctx.MultipartForm()
 	if err != nil {
@@ -41,10 +42,10 @@ func (hp *HandlerProject) upload(ctx *gin.Context) {
 		return
 	}
 	text := make(map[string]string)
-	for filePath, files := range form.File {
+	for _, files := range form.File {
 		for _, file := range files {
 			filename := filepath.Base(file.Filename)
-			absPath := fmt.Sprintf("./pkg/upload/%s%s", filePath, filename)
+			absPath := fmt.Sprintf("./pkg/upload/%s", filename)
 			if err := ctx.SaveUploadedFile(file, absPath); err != nil {
 				log.Println("保存失败！")
 				continue
@@ -53,11 +54,13 @@ func (hp *HandlerProject) upload(ctx *gin.Context) {
 			if err != nil {
 				log.Println(err.Error())
 			}
-			reply = fmt.Sprintf("%s%s:%s\n", reply, filename, text[filename])
+			reply = fmt.Sprintf("识别结果：%s\n", reply, filename, text[filename])
+			respData.Result = text[filename]
 			fmt.Println("reply:", reply)
 		}
 	}
-	ctx.JSON(http.StatusOK, resp.Success(reply))
+
+	ctx.JSON(http.StatusOK, resp.Success(respData))
 }
 
 func (hp *HandlerProject) chat(ctx *gin.Context) {
