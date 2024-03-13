@@ -5,6 +5,7 @@ import (
 	"DRSP/internal/openai"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/tmc/langchaingo/llms"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -28,6 +29,7 @@ func NewHandlerProject() *HandlerProject {
 }
 
 func (hp *HandlerProject) upload(ctx *gin.Context) {
+	openai.GetGpt().Messages = make([]llms.MessageContent, 0) //清空对话
 	resp := &common.Result{}
 	respData := &ResponseData{}
 	reply := ""
