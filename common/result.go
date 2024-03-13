@@ -3,8 +3,8 @@ package common
 type BusinessCode int
 type Result struct {
 	Code BusinessCode `json:"code"`
-	Msg  string       `json:"msg"`
-	Data any          `json:"data"`
+	Msg  string       `json:"msg,omitempty"`
+	Data any          `json:"data,omitempty"`
 }
 
 func (r *Result) Success(data any) *Result {
